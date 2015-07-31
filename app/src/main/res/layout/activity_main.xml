@@ -9,8 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/seekBar"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="57dp"
+        android:layout_above="@+id/button"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
@@ -21,7 +20,7 @@
         android:layout_height="wrap_content"
         android:text="►"
         android:id="@+id/button"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/button3"
         android:layout_centerHorizontal="true" />
 
 
@@ -31,15 +30,67 @@
         android:text="■"
         android:id="@+id/button3"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_toRightOf="@+id/button"
+        android:layout_toEndOf="@+id/button" />
 
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/listView"
-        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_above="@+id/seekBar" />
+        android:layout_below="@+id/textViewFolder"
+        android:layout_above="@+id/textViewPlaying"
+        android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
+        android:background="#ffffffff"
+        android:textColor="#00000000" />
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=">>"
+        android:id="@+id/buttonForward"
+        android:layout_below="@+id/seekBar"
+        android:layout_toRightOf="@+id/button"
+        android:layout_toEndOf="@+id/button" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="&lt;&lt;"
+        android:id="@+id/buttonBackward"
+        android:layout_below="@+id/seekBar"
+        android:layout_toLeftOf="@+id/button"
+        android:layout_toStartOf="@+id/button" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose Folder"
+        android:id="@+id/buttonFolder"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/buttonBackward"
+        android:layout_alignStart="@+id/buttonBackward"
+        android:layout_toLeftOf="@+id/button3"
+        android:layout_toStartOf="@+id/button3" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="/sdcard/music"
+        android:id="@+id/textViewFolder"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Choose a file to play"
+        android:id="@+id/textViewPlaying"
+        android:layout_above="@+id/seekBar"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
