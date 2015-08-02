@@ -30,6 +30,8 @@ public class FileExplorer extends Activity {
 
     ArrayList<String> listeDossiers;
     String currentFolder;
+    ArrayAdapter<String> adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +55,7 @@ public class FileExplorer extends Activity {
         }
 
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+        adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, listeDossiers);
 
 
@@ -67,20 +69,15 @@ public class FileExplorer extends Activity {
                     String destination = (String) folderList.getItemAtPosition(position);
                     currentFolder = currentFolder + destination + "/";
 
-                    listeDossiers = new ArrayList<>();
+                    listeDossiers.clear();
 
                     final File folder = new File(currentFolder);
-                    int nb2 = 0;
                     File[] fichiers = folder.listFiles();
                     for (File fichier : fichiers) {
                         listeDossiers.add(fichier.getName());
-                        nb2++;
                     }
 
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-                            android.R.layout.simple_list_item_1, listeDossiers);
-
-                    folderList.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
                     tvFolder.setText(currentFolder);
                 } catch (NullPointerException npe) {
                     Toast.makeText(getApplicationContext(), "It is not a folder", Toast.LENGTH_SHORT).show();
@@ -100,23 +97,15 @@ public class FileExplorer extends Activity {
 
                     File fileTemp = new File(currentFolder);
                     currentFolder = fileTemp.getParent() + "/";
-
-
-                    listeDossiers = new ArrayList<>();
+                    listeDossiers.clear();
 
                     final File folder = new File(currentFolder);
-                    int nb2 = 0;
                     File[] fichiers = folder.listFiles();
                     for (File fichier : fichiers) {
                         listeDossiers.add(0, fichier.getName());
-                        nb2++;
                     }
 
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-                            android.R.layout.simple_list_item_1, listeDossiers);
-
-                    folderList.setAdapter(adapter);
-
+                    adapter.notifyDataSetChanged();
                     tvFolder.setText(currentFolder);
                 }
             }
