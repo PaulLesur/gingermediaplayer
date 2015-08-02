@@ -31,7 +31,8 @@
         android:id="@+id/button3"
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@+id/button"
-        android:layout_toEndOf="@+id/button" />
+        android:layout_toEndOf="@+id/button"
+        android:layout_alignTop="@+id/buttonFolder" />
 
     <ListView
         android:layout_width="wrap_content"

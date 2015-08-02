@@ -1,9 +1,11 @@
 package com.via.paul.myapplication;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Environment;
@@ -25,13 +27,15 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.lang.reflect.Array;
+import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
     Button play, stop, forward, backward, folder;
     SeekBar sk;
@@ -39,38 +43,45 @@ public class MainActivity extends ActionBarActivity {
     ListView lv;
     TextView tvFolder, tvPlaying;
 
-    Map<String, File> chansons;
+    ArrayList<String> chansons;
     boolean isPlaying;
     String directory;
+    String newFolder;
+    File dossier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        directory = Environment.getExternalStorageDirectory().getPath();
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            newFolder = extras.getString("newFolder");
+            directory = newFolder;
+        }
+
         isPlaying = false;
-        directory = "/sdcard/music/";
 
-        chansons = new HashMap<>();
-
-
-        play = (Button)findViewById(R.id.button);
-        stop = (Button)findViewById(R.id.button3);
-        backward = (Button)findViewById(R.id.buttonBackward);
-        forward = (Button)findViewById(R.id.buttonForward);
-        folder = (Button)findViewById(R.id.buttonFolder);
+        chansons = new ArrayList<>();
 
 
-        sk = (SeekBar)findViewById(R.id.seekBar);
+        play = (Button) findViewById(R.id.button);
+        stop = (Button) findViewById(R.id.button3);
+        backward = (Button) findViewById(R.id.buttonBackward);
+        forward = (Button) findViewById(R.id.buttonForward);
+        folder = (Button) findViewById(R.id.buttonFolder);
 
-        mp = MediaPlayer.create(getApplicationContext(), Uri.parse("/sdcard/music/play.mp3"));
 
-        lv = (ListView)findViewById(R.id.listView);
-        TextView test = new TextView(getApplicationContext());
-        test.setText("element");
+        sk = (SeekBar) findViewById(R.id.seekBar);
 
-        tvFolder = (TextView)findViewById(R.id.textViewFolder);
-        tvPlaying = (TextView)findViewById(R.id.textViewPlaying);
+        lv = (ListView) findViewById(R.id.listView);
+
+        tvFolder = (TextView) findViewById(R.id.textViewFolder);
+        tvPlaying = (TextView) findViewById(R.id.textViewPlaying);
+
+        tvFolder.setText(directory);
 
         sk.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -78,8 +89,8 @@ public class MainActivity extends ActionBarActivity {
                 if (fromUser) {
                     try {
                         mp.seekTo(sk.getProgress());
-                    } catch (NullPointerException npe){
-                        Toast.makeText(getApplicationContext(), "Veuillez choisir un morceau de musique", Toast.LENGTH_SHORT).show();
+                    } catch (NullPointerException npe) {
+
                     }
                 }
 
@@ -96,61 +107,78 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        sk.setMax(mp.getDuration());
+        try {
+            sk.setMax(mp.getDuration());
+        } catch (NullPointerException npe) {
+            sk.setMax(100);
+        }
 
         sk.postDelayed(new Runnable() {
             @Override
             public void run() {
-                try{
+                try {
                     sk.setProgress(mp.getCurrentPosition());
-                }catch(Exception e){}
+                } catch (Exception e) {
+                }
                 sk.postDelayed(this, 100);
             }
         }, 100);
 
-        File dossier = new File(Environment.getExternalStorageDirectory().getPath()+"/music/");
-        int nb = 0;
-        File[] fichiers = dossier.listFiles();
-        for (File fichier: fichiers) {
-            chansons.put(fichier.getName(), fichier);
-            nb++;
+        try {
+            dossier = new File(newFolder);
+        } catch (NullPointerException npe) {
+            dossier = new File(Environment.getExternalStorageDirectory().getPath());
         }
 
-        String[] tabChansons = chansons.keySet().toArray(new String[0]);
+        File[] fichiers = dossier.listFiles();
+        for (File fichier : fichiers) {
+            String type = URLConnection.guessContentTypeFromName(fichier.getName());
+            if ("audio/mpeg".equals(type)) {
+                chansons.add(fichier.getName());
+            }
+        }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, android.R.id.text1, tabChansons);
+                android.R.layout.simple_list_item_1, android.R.id.text1, chansons);
 
 
         // Assign adapter to ListView
         lv.setAdapter(adapter);
 
 
-
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isPlaying) {
-                    play.setText("►");
-                    mp.pause();
-                    isPlaying = false;
-                } else {
-                    play.setText("||");
-                    mp.start();
-                    isPlaying = true;
+                try {
+                    if (isPlaying) {
+                        mp.pause();
+                        play.setText("►");
+                        isPlaying = false;
+                    } else {
+                        mp.start();
+                        play.setText("||");
+                        isPlaying = true;
+                    }
+
+                } catch (NullPointerException npe) {
+                    Toast.makeText(getApplicationContext(), "Please select a music", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
 
-
         stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mp.seekTo(0);
-                mp.pause();
-                play.setText("►");
-                isPlaying=false;
+
+                try {
+                    mp.seekTo(0);
+                    mp.pause();
+                    play.setText("►");
+                    isPlaying = false;
+                } catch (NullPointerException npe) {
+                    Toast.makeText(getApplicationContext(), "Please select a music", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -159,7 +187,10 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String itemValue = (String) lv.getItemAtPosition(position);
-                try{mp.stop();} catch (NullPointerException npe){}
+                try {
+                    mp.stop();
+                } catch (NullPointerException npe) {
+                }
                 mp = MediaPlayer.create(getApplicationContext(), Uri.parse(directory + itemValue));
                 play.setText("||");
                 try {
@@ -168,8 +199,8 @@ public class MainActivity extends ActionBarActivity {
                     sk.setMax(mp.getDuration());
                     tvPlaying.setText(itemValue);
                     Toast.makeText(getApplicationContext(), itemValue, Toast.LENGTH_SHORT).show();
-                } catch (Exception e){
-                    Toast.makeText(getApplicationContext(),"It's not a music file !", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "It's not a music file !", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -177,10 +208,24 @@ public class MainActivity extends ActionBarActivity {
         folder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showInputDialog();
+
+                Intent i = new Intent(MainActivity.this, FileExplorer.class);
+                startActivity(i);
+
             }
         });
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try{
+            mp.stop();
+            mp.release();
+        } catch (NullPointerException npe){
+
+        }
     }
 
     @Override
@@ -189,66 +234,8 @@ public class MainActivity extends ActionBarActivity {
         notification();
     }
 
-    public void notification(){
-        NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+    public void notification() {
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-    }
-
-
-
-    protected void showInputDialog() {
-
-        //Button button = (Button) findViewById(R.id.buttonOk);
-        // get prompts.xml view
-        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
-        View promptView = layoutInflater.inflate(R.layout.input_dialog, null);
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-        alertDialogBuilder.setView(promptView);
-
-        final EditText editText = (EditText) promptView.findViewById(R.id.edittext);
-        // setup a dialog window
-        alertDialogBuilder.setCancelable(false)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        directory = editText.getText().toString();
-
-                        try {
-
-
-                            chansons = new HashMap<>();
-                            File dossier = new File(directory);
-                            int nb = 0;
-                            File[] fichiers = dossier.listFiles();
-                            for (File fichier : fichiers) {
-                                chansons.put(fichier.getName(), fichier);
-                                nb++;
-                            }
-
-                            String[] tabChansons = chansons.keySet().toArray(new String[0]);
-
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-                                    android.R.layout.simple_list_item_1, android.R.id.text1, tabChansons);
-
-
-                            // Assign adapter to ListView
-                            lv.setAdapter(adapter);
-
-                            tvFolder.setText(directory);
-                        } catch (NullPointerException npe){
-                            Toast.makeText(getApplication(), "Invalid path", Toast.LENGTH_SHORT).show();
-                        }
-                        
-                    }
-                })
-                .setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-
-        // create an alert dialog
-        AlertDialog alert = alertDialogBuilder.create();
-        alert.show();
     }
 }
