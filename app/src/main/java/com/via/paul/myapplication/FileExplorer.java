@@ -16,6 +16,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
@@ -45,6 +48,16 @@ public class FileExplorer extends Activity {
 
         listeDossiers = new ArrayList<>();
 
+        try {
+            URL url = new URL("ftp://pi:raspberry@192.168.1.170/media/PNY/");
+            URLConnection urlconnection = url.openConnection();
+            Toast.makeText(getApplicationContext(),urlconnection.getContentType(), Toast.LENGTH_SHORT).show();
+        } catch (MalformedURLException e) {
+            Toast.makeText(getApplicationContext(),"malformed url", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(getApplicationContext(),"ioexception", Toast.LENGTH_SHORT).show();
+        }
+
         final File folder = new File(Environment.getExternalStorageDirectory().getPath());
         currentFolder = Environment.getExternalStorageDirectory().getPath() + "/";
         tvFolder.setText(currentFolder);
@@ -70,8 +83,7 @@ public class FileExplorer extends Activity {
                     currentFolder = currentFolder + destination + "/";
 
                     listeDossiers.clear();
-
-                    final File folder = new File(currentFolder);
+                    File folder = new File(currentFolder);
                     File[] fichiers = folder.listFiles();
                     for (File fichier : fichiers) {
                         listeDossiers.add(fichier.getName());
@@ -118,7 +130,7 @@ public class FileExplorer extends Activity {
 
                 Intent i = new Intent(FileExplorer.this, MainActivity.class);
                 i.putExtra("newFolder", currentFolder);
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
                 startActivity(i);
             }
